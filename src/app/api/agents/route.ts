@@ -20,7 +20,9 @@ export async function GET(req: NextRequest) {
       { $group: { _id: '$assignedTo', total: { $sum: 1 }, closed: { $sum: { $cond: [{ $eq: ['$status', 'Closed'] }, 1, 0] } } } },
     ]);
 
-    const countMap = new Map(leadCounts.map((l) => [l._id.toString(), l]));
+    const countMap = new Map<string, { total: number; closed: number }>(
+  leadCounts.map((l) => [l._id.toString(), { total: l.total, closed: l.closed }])
+);
 
     const agentsWithStats = agents.map((agent) => {
       const stats = countMap.get(agent._id.toString());
