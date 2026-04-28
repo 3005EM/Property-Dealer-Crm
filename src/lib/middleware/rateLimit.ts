@@ -1,20 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Simple in-memory rate limiter
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 
 export function rateLimit(
   req: NextRequest,
   role: 'admin' | 'agent' | 'unknown' = 'unknown'
 ) {
-  // Admins have no limit
   if (role === 'admin') return null;
 
   const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
   const key = `${ip}:${role}`;
   const now = Date.now();
-  const windowMs = 60 * 1000; // 1 minute
+  const windowMs = 60 * 1000;
   const maxRequests = role === 'agent' ? 50 : 100;
+
+  // Inline cleanup using Array.from to avoid iterator downlevel issues
+  if (rateLimitStore.size > 500) {
+    Array.from(rateLimitStore.keys()).forEach(k => {
+      const v = rateLimitStore.get(k)!;
+      if (now > v.resetTime) rateLimitStore.delete(k);
+    });
+  }
 
   const existing = rateLimitStore.get(key);
 
@@ -40,11 +46,3 @@ export function rateLimit(
   existing.count++;
   return null;
 }
-
-// Clean up old entries every 5 minutes
-setInterval(() => {
-  const now = Date.now();
-  for (const [key, value] of rateLimitStore.entries()) {
-    if (now > value.resetTime) rateLimitStore.delete(key);
-  }
-}, 5 * 60 * 1000);
