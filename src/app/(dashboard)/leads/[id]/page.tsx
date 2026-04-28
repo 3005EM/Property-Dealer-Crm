@@ -31,6 +31,13 @@ interface Suggestion {
   suggestions: string[]; estimatedConversionChance: string; messageTemplate: string;
 }
 
+interface EditForm {
+  status?: string;
+  notes?: string;
+  followUpDate?: string;
+  assignedTo?: string;
+}
+
 const ACTIVITY_ICONS: Record<string, { icon: string; color: string }> = {
   created: { icon: '✨', color: 'bg-blue-500/20 border-blue-500/30' },
   status_updated: { icon: '🔄', color: 'bg-purple-500/20 border-purple-500/30' },
@@ -67,7 +74,7 @@ export default function LeadDetailPage() {
   const [editMode, setEditMode] = useState(false);
   const [agents, setAgents] = useState<{ _id: string; name: string }[]>([]);
   const [showSuggestion, setShowSuggestion] = useState(false);
-  const [editForm, setEditForm] = useState<Partial<Lead & { assignedTo: string }>>({});
+  const [editForm, setEditForm] = useState<EditForm>({});
 
   useEffect(() => {
     Promise.all([
