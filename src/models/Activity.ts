@@ -11,7 +11,6 @@ export type ActivityType =
   | 'contacted';
 
 export interface IActivity extends Document {
-  _id: string;
   lead: mongoose.Types.ObjectId;
   performedBy: mongoose.Types.ObjectId;
   type: ActivityType;
