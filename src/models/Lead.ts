@@ -6,7 +6,6 @@ export type PropertyInterest = 'Residential' | 'Commercial' | 'Plot' | 'Apartmen
 export type LeadSource = 'Facebook Ads' | 'Walk-in' | 'Website' | 'Referral' | 'Other';
 
 export interface ILead extends Document {
-  _id: string;
   name: string;
   email: string;
   phone: string;
