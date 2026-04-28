@@ -5,7 +5,6 @@ import Activity from '@/models/Activity';
 import { requireAuth } from '@/lib/middleware/authHelper';
 
 function generateFollowUpSuggestion(lead: {
-  name: string;
   status: string;
   priority: string;
   budget: number;
