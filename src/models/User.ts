@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 export interface IUser extends Document {
   name: string;
   email: string;
-  password: string;
+  password?: string;
   role: 'admin' | 'agent';
   phone?: string;
   avatar?: string;
@@ -30,17 +30,17 @@ const UserSchema = new Schema<IUser>(
 UserSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   const salt = await bcrypt.genSalt(12);
-  this.password = await bcrypt.hash(this.password, salt);
+  this.password = await bcrypt.hash(this.password as string, salt);
   next();
 });
 
 UserSchema.methods.comparePassword = async function (password: string): Promise<boolean> {
-  return bcrypt.compare(password, this.password);
+  return bcrypt.compare(password, this.password as string);
 };
 
 UserSchema.set('toJSON', {
   transform: (_doc, ret) => {
-    delete ret.password;
+    ret.password = undefined;
     return ret;
   },
 });
