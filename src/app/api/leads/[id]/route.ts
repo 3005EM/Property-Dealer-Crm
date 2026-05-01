@@ -16,12 +16,14 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 
   try {
     await connectDB();
-    const lead = await Lead.findById(params.id).populate('assignedTo', 'name email phone');
+    const lead = await Lead.findById(params.id);
     if (!lead) return NextResponse.json({ error: 'Lead not found' }, { status: 404 });
-
+    
     if (user!.role === 'agent' && lead.assignedTo?.toString() !== user!.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
+    
+    await lead.populate('assignedTo', 'name email phone');
 
     return NextResponse.json({ lead });
   } catch {
